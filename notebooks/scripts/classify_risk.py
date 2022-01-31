@@ -1,7 +1,9 @@
 import pandas as pd
-import numpy as np
-import statistics
 import pickle
+from scripts.utils import preprocess_prototype, preprocess_augmented
+
+import warnings
+warnings.filterwarnings("ignore")
 
 class ClassifyRisk:
     """
@@ -33,15 +35,9 @@ class ClassifyRisk:
         with open('../models/pca_vectorizer.pkl', 'rb') as f:
             self.pca_vectorizer = pickle.load(f)
 
-        # open the models created in the ModelRiskClass notebook
-        with open('../models/model_lm.pkl', 'rb') as f:
-            self.model_lm = pickle.load(f)
-        with open('../models/model_rfc.pkl', 'rb') as f:
-            self.model_rfc = pickle.load(f)
-        with open('../models/model_lgb.pkl', 'rb') as f:
-            self.model_lgb = pickle.load(f)
-        with open('../models/model_gnb.pkl', 'rb') as f:
-            self.model_gnb = pickle.load(f)
+        # open the ensemble model created in the ModelRiskClass notebook
+        with open('../models/model_ensemble_all.pkl', 'rb') as f:
+            self.model = pickle.load(f)
         
         # access the dataframe provided by NASA
         self.df = df
@@ -58,7 +54,7 @@ class ClassifyRisk:
                 - Type: str
                 - Default value: 'Abstract'
         
-        Returns: N/A
+        Returns: df
         """
         # keep only the title and abstract columns
         temp_df = self.df[[title_col, abstract_col]]
@@ -68,31 +64,26 @@ class ClassifyRisk:
         temp_df.drop([title_col, abstract_col], axis=1, inplace=True)
 
         # call the create_pca_representation() function to generate the PCA matrix from the description
-        pca_matrix_pro = self.create_pca_representation(temp_df)
+        pca_matrix_pro = self.create_pca_representation(temp_df['Description'])
         temp_df.drop('Description', axis=1, inplace=True)
-        temp_df = pd.concat([self.df, pd.DataFrame(pca_matrix_pro)], axis=1)
+        temp_df = pd.concat([temp_df, pd.DataFrame(pca_matrix_pro)], axis=1)
 
-        # create predictions on input data using all of the models from the ModelRiskClass notebook
-        pred_lm  = self.model_lm.predict(self.df)
-        pred_rfc = self.model_rfc.predict(self.df)
-        pred_lgb = self.model_lgb.predict(self.df)
-        pred_gnb = self.model_gnb.predict(self.df)
+        # create predictions on input data using the ensemble model from the ModelRiskClass notebook
+        pred_code = pd.Series(self.model.predict(temp_df))
 
-        # ensemble the predictions
-        df_pred = pd.DataFrame([pred_lm, pred_rfc, pred_lgb, pred_gnb]).T
-        pred = df_pred.apply(statistics.mode, axis=1)
+        # convert predictions into understandable format
+        pred_desc = pred_code.replace({0: 'Catastrophic Failure',
+                                       1: 'High-Cost Aviation Projects',
+                                       2: 'XYZ',
+                                       4: 'Catch-All'})
 
-        # convert predictions into usable format
-        pred = pred.replace({0: 'Catastrophic Failure',
-                             1: 'High-Cost Aviation Projects',
-                             2: 'XYZ',
-                             4: 'Catch-All'})
-        self.df['Risk Class'] = pred
+        self.df['Risk Class Code'] = pred_code
+        self.df['Risk Class Description'] = pred_desc
         
         # return dataframe with risk identified
         return self.df
 
-    def create_pca_representation(self):
+    def create_pca_representation(self, desc: pd.Series=None):
         """
         Modified version of create_pca_representation() from the ModelRiskClass notebook
 
@@ -101,7 +92,7 @@ class ClassifyRisk:
             - pca_matrix: transformed PCA representation of the Description column
         """
         # transform the Description column using the tfidf_vectorizer
-        tfidf_matrix = self.tfidf_vectorizer.transform(self.df['Description'])
+        tfidf_matrix = self.tfidf_vectorizer.transform(desc)
         tfidf_df     = pd.DataFrame(tfidf_matrix.todense())
 
         # return the tfidf matrix transformed by the pca_vectorizer
