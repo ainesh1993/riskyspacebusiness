@@ -45,6 +45,7 @@ class ClassifyRisk:
         elif model_type=='lgb':      model_filename = '../models/model_lgb.pkl'
         elif model_type=='knn':      model_filename = '../models/model_knn.pkl'
         elif model_type=='gnb':      model_filename = '../models/model_gnb.pkl'
+        else:                        model_filename = '../models/model_ensemble.pkl'
 
         # open the model specified by user input
         with open(model_filename, 'rb') as f:
@@ -65,7 +66,8 @@ class ClassifyRisk:
                 - Type: str
                 - Default value: ''
         
-        Returns: dictionary with classification details for the provided project
+        Returns:
+            - dict: dictionary with classification details for the provided project
         """
         # generate 'Description' by appending title and abstract
         description = title + ' ' + abstract
@@ -103,7 +105,8 @@ class ClassifyRisk:
                 - Type: str
                 - Default value: 'Abstract'
         
-        Returns: df
+        Returns:
+            - df: dataframe containing predictions and probabilities for all projects
         """
         # keep only the title and abstract columns
         temp_df = self.df[[title_col, abstract_col]]
@@ -137,7 +140,11 @@ class ClassifyRisk:
         """
         Modified version of create_pca_representation() from the ModelRiskClass notebook
 
-        Inputs: N/A
+        Inputs:
+            - desc: column containing description from dataframe
+                - Type: pd.Series
+                - Default value: None
+
         Returns:
             - pca_matrix: transformed PCA representation of the Description column
         """
