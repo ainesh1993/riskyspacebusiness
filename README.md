@@ -34,4 +34,5 @@ Second, [ModelRiskClass.ipynb](https://github.com/ainesh1993/riskyspacebusiness/
 Furthermore, the `classify_risk.py` script has been developed and saved in the scripts directory of the project (within the notebooks directory) to facilitate two processes for NASA in the future:
 - the batch classification of multiple projects using a CSV file (the [ClassifyRisk_batch.ipynb](https://github.com/ainesh1993/riskyspacebusiness/blob/main/notebooks/ClassifyRisk_batch.ipynb) notebook serves as an example of this process)
 - the classification of an individual project using the Title and Abstract (the [ClassifyRisk.ipynb](https://github.com/ainesh1993/riskyspacebusiness/blob/main/notebooks/ClassifyRisk.ipynb) notebook serves as an example of this process).
+
 Simply update the user inputs (which are heavily documented for ease of use) defined at the beginning of these notebooks to classify future NASA projects.
