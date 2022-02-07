@@ -5,22 +5,12 @@ Team:
 
 ## Abstract
 
-<!-- For this challenge, we decided to assess the impact of changes in features that were measured across maternal hospital visits on different adverse pregnancy outcomes. To that extent, we divided the challenge's dataset into several components:
-- a __covariates__ dataset with demographic and socio-economic information,
-- a __deltas__ dataset capturing changes in features across multiple visits, and
-- a __targets__ dataset with outcome variables related to maternal morbidity.
-
-For each target variable, we trained and tuned 3 classification models: a _Logistic Regression Model_, a _Light Gradient Boosting Machine (LGBM)_ and a _Random Forest_. We assessed which of the three models perfomed the best in terms of the F-1 score (the harmonic mean between precision and recall metrics, going beyond the accuracy metric which we found to be unhelpful given the imbalanced distributions of the target variables) of the positive class. After dropping target variables with low support, we were able to identify impactful features for the following morbidities:
-- Chronic Hypertension
-- Postpartum Depression
-- Postpartum Anxiety
-- Preeclampsia
-
-We then identified the 10 most important features in predicting each target and broke down the top features' univariate distributions by racial categories. We find that there are several impactful delta features related to the mother's sleep behavior, the mother's general health, pregnancy progression, and fetal health that also demonstrate distinctly different distributional behavior for the majority race class (white women) when compared to minority race classes. These findings can guide the direction of future research into the drivers of the APOs analyzed in this solution. -->
+The National Aeronautics and Space Administration (NASA) executes complicated projects prone to a variety of risk. To alleviate these risks, NASA wants to develop an AI/ML solution to categorize and predict risk for future projects. In this white paper, we address this problem by applying topic modeling with LDA to extract risk categories and training a gamut of multi-class modeling algorithms to predict future risk.
+Topic modeling with LDA revealed three main categories of risk: technical execution risk, managerial process risk, and operational cost risk. After classifying the risk of each past project, we trained and tuned base multi-class models and developed custom ensembles. Our final model, an ensemble of three base classifiers, performs with a stable 79% accuracy, macro-average F1, and weighted-average F1 with just the projects’ title and abstract as inputs. Using this model, NASA can quickly and accurately predict potential pitfalls in future projects and adjust their execution accordingly, increasing future project success rate and leading to fewer adverse outcomes.
 
 ## White Paper
 
-For a detailed explanation of the analysis performed for this challenge, please read the white paper (available in [DOCX]() and [PDF]() format).
+For a detailed explanation of the analysis performed for this challenge, please read the white paper (available in [DOCX](https://github.com/ainesh1993/riskyspacebusiness/blob/main/Flight%20Risk%20-%20White%20Paper.docx) and [PDF](https://github.com/ainesh1993/riskyspacebusiness/blob/main/Flight%20Risk%20-%20White%20Paper.pdf) format).
 
 ## Running this project
 
