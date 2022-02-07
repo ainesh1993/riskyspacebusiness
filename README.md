@@ -6,6 +6,7 @@ Team:
 ## Abstract
 
 The National Aeronautics and Space Administration (NASA) executes complicated projects prone to a variety of risk. To alleviate these risks, NASA wants to develop an AI/ML solution to categorize and predict risk for future projects. In this white paper, we address this problem by applying topic modeling with LDA to extract risk categories and training a gamut of multi-class modeling algorithms to predict future risk.
+
 Topic modeling with LDA revealed three main categories of risk: technical execution risk, managerial process risk, and operational cost risk. After classifying the risk of each past project, we trained and tuned base multi-class models and developed custom ensembles. Our final model, an ensemble of three base classifiers, performs with a stable 79% accuracy, macro-average F1, and weighted-average F1 with just the projects’ title and abstract as inputs. Using this model, NASA can quickly and accurately predict potential pitfalls in future projects and adjust their execution accordingly, increasing future project success rate and leading to fewer adverse outcomes.
 
 ## White Paper
