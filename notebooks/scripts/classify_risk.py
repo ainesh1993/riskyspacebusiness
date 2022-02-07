@@ -78,17 +78,35 @@ class ClassifyRisk:
         temp_df.drop('Description', axis=1, inplace=True)
         temp_df = pd.concat([temp_df, pd.DataFrame(pca_representation)], axis=1)
 
-        # create predictions on input data using the ensemble model from the ModelRiskClass notebook
-        pred_code = pd.Series(self.model.predict(temp_df))
-        pred_prob = [max(x) for x in self.model.predict_proba(temp_df)]
+        # get probabilities of each risk class using the ensemble model from the ModelRiskClass notebook
+        risk_probs = self.model.predict_proba(temp_df)
+
+        # create risk profile from probabilities
+        risk_profile = {}
+        codes = range(0, 3)
+        for code in codes:
+            desc = None
+            if   code==0: desc = 'Technical Execution Risk'
+            elif code==1: desc = 'Managerial Process Risk'
+            elif code==2: desc = 'Operational Cost Risk'
+
+            prob = risk_probs[0][code]
+            risk_profile[desc] = prob
+
+        # create predictions on input data using the ensemble model
+        highest_code = pd.Series(self.model.predict(temp_df))
+        highest_prob = [max(x) for x in risk_probs]
 
         # convert predictions into understandable format
-        pred_desc = pred_code.replace({0: 'Technical Execution Risk',
-                                       1: 'Managerial Process Risk',
-                                       2: 'Operational Cost Risk'})
+        highest_desc = highest_code.replace({0: 'Technical Execution Risk',
+                                             1: 'Managerial Process Risk',
+                                             2: 'Operational Cost Risk'})
         
-        # return dataframe with risk identified
-        return {'Risk Class Code': pred_code[0], 'Risk Class Description': pred_desc[0], 'Risk Class Probability': pred_prob[0]}
+        # return dataframe with highest risk identified and risk profile
+        return {'Highest Risk Class Code': highest_code[0],
+                'Highest Risk Class': highest_desc[0],
+                'Highest Risk Class Probability': highest_prob[0],
+                'Overall Risk Profile': risk_profile}
 
     def batch_classify(self, id_col: str='Lesson ID', title_col: str='Title', abstract_col: str='Abstract'):
         """
@@ -120,7 +138,10 @@ class ClassifyRisk:
         temp_df.drop('Description', axis=1, inplace=True)
         temp_df = pd.concat([temp_df, pd.DataFrame(pca_matrix_pro)], axis=1)
 
-        # create predictions on input data using the ensemble model from the ModelRiskClass notebook
+        # get probabilities of each risk class using the ensemble model from the ModelRiskClass notebook
+        risk_probs = self.model.predict_proba(temp_df)
+
+        # create predictions on input data using the ensemble model
         pred_code = pd.Series(self.model.predict(temp_df))
         pred_prob = [max(x) for x in self.model.predict_proba(temp_df)]
 
@@ -129,12 +150,17 @@ class ClassifyRisk:
                                        1: 'Managerial Process Risk',
                                        2: 'Operational Cost Risk'})
 
-        self.df['Risk Class Code'] = pred_code
-        self.df['Risk Class Description'] = pred_desc
-        self.df['Risk Class Probability'] = pred_prob
+        self.df['Highest Risk Class Code'] = pred_code
+        self.df['Highest Risk Class'] = pred_desc
+        self.df['Highest Risk Class Probability'] = pred_prob
+        self.df['Technical Execution Risk'] = [x[0] for x in risk_probs]
+        self.df['Managerial Process Risk'] = [x[1] for x in risk_probs]
+        self.df['Operational Cost Risk'] = [x[2] for x in risk_probs]
         
         # return dataframe with risk identified
-        return self.df[[id_col, title_col, abstract_col, 'Risk Class Code', 'Risk Class Description', 'Risk Class Probability']]
+        return self.df[[id_col, title_col, abstract_col,
+                        'Highest Risk Class Code', 'Highest Risk Class', 'Highest Risk Class Probability',
+                        'Technical Execution Risk', 'Managerial Process Risk', 'Operational Cost Risk']]
 
     def create_pca_representation(self, desc: pd.Series=None):
         """
